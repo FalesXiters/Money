@@ -12,7 +12,7 @@
             background-color: #f0f8ff;
             margin: 0;
             padding: 0;
-            overflow: hidden; /* Para evitar barras de rolagem com a animação */
+            overflow: hidden;
         }
         h1 {
             font-size: 2.5em;
@@ -83,39 +83,32 @@
             }
         }
 
-        /* Animação para várias imagens de dinheiro caindo continuamente */
-        .money-rain {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 999;
-            overflow: hidden;
+        /* Estilo para o X vermelho */
+        .red-x {
+            color: red;
+            font-weight: bold;
+            font-size: 20px;  /* Aumentando o tamanho do "X" */
         }
 
-        .money-rain img {
+        /* Animação para a queda da imagem */
+        .falling-image {
             position: absolute;
-            width: auto;
-            height: 90px; /* Altura fixa */
-            opacity: 0;
-            animation: fall 5s cubic-bezier(0.25, 0.1, 0.25, 1) infinite, fadeIn 0.5s ease-in-out forwards;
+            width: 60px;  /* Tamanho maior para a imagem de dinheiro */
+            height: 60px;
+            animation: fall 2s linear forwards;
         }
 
         @keyframes fall {
             0% {
-                transform: translateY(-100px) rotate(0deg);
-                opacity: 1;
-            }
-            90% {
+                transform: translateY(-100px);
                 opacity: 1;
             }
             100% {
-                transform: translateY(100vh) rotate(360deg);
-                opacity: 0.3; /* Desaparecendo suavemente */
+                transform: translateY(100vh);
+                opacity: 0;
             }
         }
+
     </style>
 </head>
 <body>
@@ -135,6 +128,38 @@
                     tableHTML += "</tr>";
                 }
                 document.write(tableHTML);
+
+                // Função para alternar entre o número e o "X"
+                function toggleCell(cell) {
+                    const originalValue = cell.getAttribute("data-number");
+                    const currentContent = cell.innerHTML;
+
+                    if (currentContent === "<span class='red-x'>X</span>") {
+                        // Se o conteúdo for "X", voltar ao número original
+                        cell.innerHTML = originalValue;
+                    } else if (currentContent === originalValue) {
+                        // Se o conteúdo for o número original, adicionar o "X"
+                        cell.innerHTML = "<span class='red-x'>X</span>";
+                        createFallingImage(cell);  // Chama a função para a imagem cair
+                    }
+                }
+
+                // Função para criar a animação da imagem caindo
+                function createFallingImage(cell) {
+                    const moneyImg = document.createElement("img");
+                    moneyImg.src = 'https://i.ibb.co/2nS5GZ3/ca6050d7abf2199d3a0d920831665487-removebg-preview.png'; // Caminho da imagem fornecida
+                    moneyImg.classList.add("falling-image");
+
+                    // Posicionar a imagem sobre a célula clicada
+                    const rect = cell.getBoundingClientRect();
+                    moneyImg.style.left = `${rect.left + window.scrollX + rect.width / 2 - 30}px`; // Centralizando a imagem
+                    moneyImg.style.top = `${rect.top + window.scrollY}px`;
+
+                    document.body.appendChild(moneyImg);
+
+                    // Remover a imagem após a animação
+                    setTimeout(() => moneyImg.remove(), 2000);
+                }
             </script>
         </table>
         <p class="phrase">"Atrás das notas!"</p>
@@ -142,30 +167,5 @@
     <footer>
         <p>Desenvolvido para seu desafio de economia | Clique duas vezes nos números para marcar depósitos!</p>
     </footer>
-    <div class="money-rain" id="moneyRainContainer"></div>
-    <script>
-        const moneyRainContainer = document.getElementById("moneyRainContainer");
-
-        function createMoneyRain() {
-            const moneyImg = document.createElement("img");
-            moneyImg.src = 'https://i.ibb.co/9YKrxZ9/ca6050d7abf2199d3a0d920831665487-removebg-preview.png'; // Caminho da nova imagem
-            moneyImg.style.left = `${Math.random() * 100}vw`; // Posicionamento aleatório
-            moneyImg.style.animationDuration = `${Math.random() * 3 + 5}s`; // Tempo aleatório para a animação de queda
-            moneyRainContainer.appendChild(moneyImg);
-
-            // Remover a imagem após a animação
-            setTimeout(() => moneyImg.remove(), 6000);
-        }
-
-        // Criar chuva contínua de dinheiro
-        setInterval(createMoneyRain, 300);
-
-        // Iniciar a chuva de dinheiro ao carregar a página
-        window.onload = () => {
-            for (let i = 0; i < 15; i++) {
-                createMoneyRain();
-            }
-        };
-    </script>
 </body>
 </html>
